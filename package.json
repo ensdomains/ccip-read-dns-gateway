@@ -1,0 +1,69 @@
+{
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "yarn build && node dist/index.js",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
+  },
+  "peerDependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "ccip-read-dns-gateway",
+  "author": "Nick Johnson",
+  "module": "dist/ccip-read-dns-gateway.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/ccip-read-dns-gateway.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/ccip-read-dns-gateway.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^8.1.2",
+    "@types/chai": "^4.3.4",
+    "@types/chai-as-promised": "^7.1.5",
+    "@types/supertest": "^2.0.11",
+    "chai": "^4.3.7",
+    "chai-as-promised": "^7.1.1",
+    "dns-packet": "^5.4.0",
+    "husky": "^8.0.3",
+    "size-limit": "^8.1.2",
+    "supertest": "^6.1.6",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@chainlink/ccip-read-server": "^0.2.1",
+    "@ensdomains/dnsprovejs": "^0.4.1",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.4.4",
+    "node-fetch": "2.6.1"
+  }
+}
