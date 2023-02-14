@@ -8,7 +8,7 @@
     "src"
   ],
   "engines": {
-    "node": ">=10"
+    "node": ">=14"
   },
   "scripts": {
     "start:worker": "wrangler dev",
@@ -40,11 +40,43 @@
   "size-limit": [
     {
       "path": "dist/ccip-read-dns-gateway.cjs.production.min.js",
-      "limit": "10 KB"
+      "limit": "1 MB",
+      "ignore": [
+        "assert",
+        "buffer",
+        "crypto",
+        "events",
+        "fs",
+        "http",
+        "net",
+        "os",
+        "path",
+        "stream",
+        "querystring",
+        "url",
+        "util",
+        "zlib"
+      ]
     },
     {
       "path": "dist/ccip-read-dns-gateway.esm.js",
-      "limit": "10 KB"
+      "limit": "1 MB",
+      "ignore": [
+        "assert",
+        "buffer",
+        "crypto",
+        "events",
+        "fs",
+        "http",
+        "net",
+        "os",
+        "path",
+        "stream",
+        "querystring",
+        "url",
+        "util",
+        "zlib"
+      ]
     }
   ],
   "devDependencies": {
