@@ -1,0 +1,14 @@
+name = "ccip-read-dns-worker"
+main = "src/worker.ts"
+compatibility_date = "2023-02-14"
+account_id = "de97cd2a1370a6ed2ad759f894179bff"
+node_compat = true
+
+[dev]
+port = 8000
+
+[build]
+command = "yarn build"
+
+[env.production.vars]
+DOH_API="https://cloudflare-dns.com/dns-query"

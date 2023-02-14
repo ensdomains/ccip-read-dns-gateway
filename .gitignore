@@ -1,4 +1,5 @@
 *.log
 .DS_Store
+.dev.vars
 node_modules
 dist

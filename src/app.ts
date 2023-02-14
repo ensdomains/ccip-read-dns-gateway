@@ -1,9 +1,8 @@
-import { Server } from '@chainlink/ccip-read-server';
 import { DNSProver } from '@ensdomains/dnsprovejs';
 import { ethers } from 'ethers';
 import * as packet from 'dns-packet';
 
-export function makeApp(sendQuery: ConstructorParameters<typeof DNSProver>[0], path: string) {
+export function makeApp(sendQuery: ConstructorParameters<typeof DNSProver>[0], path: string, Server: any) {
   const prover = new DNSProver(sendQuery);
 
   const server = new Server();
