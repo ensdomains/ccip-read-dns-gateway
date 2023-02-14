@@ -10,5 +10,5 @@ port = 8000
 [build]
 command = "yarn build"
 
-[env.production.vars]
+[vars]
 DOH_API="https://cloudflare-dns.com/dns-query"
