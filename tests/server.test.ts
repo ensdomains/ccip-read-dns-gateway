@@ -1,3 +1,4 @@
+import { Server } from '@chainlink/ccip-read-server';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ethers } from 'ethers';
@@ -51,7 +52,7 @@ describe('ccip-read-dns-gateway', () => {
         'A'
       ]);
       const sendQuery = makeQueryFunc(RESPONSES);
-      await supertest(makeApp(sendQuery, '/'))
+      await supertest(makeApp(sendQuery, '/', Server))
         .get(`/${TEST_ADDRESS}/${calldata}.json`)
         .send()
         .expect(200)
