@@ -20,8 +20,7 @@
     "test": "tsdx test",
     "lint": "tsdx lint",
     "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
+    "size": "bundlesize"
   },
   "husky": {
     "hooks": {
@@ -37,59 +36,27 @@
   "name": "ccip-read-dns-gateway",
   "author": "Nick Johnson",
   "module": "dist/ccip-read-dns-gateway.esm.js",
-  "size-limit": [
+  "bundlesize": [
     {
       "path": "dist/ccip-read-dns-gateway.cjs.production.min.js",
-      "limit": "1 MB",
-      "ignore": [
-        "assert",
-        "buffer",
-        "crypto",
-        "events",
-        "fs",
-        "http",
-        "net",
-        "os",
-        "path",
-        "stream",
-        "querystring",
-        "url",
-        "util",
-        "zlib"
-      ]
+      "maxSize": "10 KB"
     },
     {
       "path": "dist/ccip-read-dns-gateway.esm.js",
-      "limit": "1 MB",
-      "ignore": [
-        "assert",
-        "buffer",
-        "crypto",
-        "events",
-        "fs",
-        "http",
-        "net",
-        "os",
-        "path",
-        "stream",
-        "querystring",
-        "url",
-        "util",
-        "zlib"
-      ]
+      "maxSize": "10 KB"
     }
   ],
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230214.0",
-    "@size-limit/preset-small-lib": "^8.1.2",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
+    "@types/dns-packet": "^5.2.4",
     "@types/supertest": "^2.0.11",
+    "bundlesize": "^0.18.1",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "dns-packet": "^5.4.0",
     "husky": "^8.0.3",
-    "size-limit": "^8.1.2",
     "supertest": "^6.1.6",
     "tsdx": "^0.14.1",
     "tslib": "^2.5.0",
