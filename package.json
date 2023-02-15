@@ -52,7 +52,7 @@
     "@types/chai-as-promised": "^7.1.5",
     "@types/dns-packet": "^5.2.4",
     "@types/supertest": "^2.0.11",
-    "bundlesize": "^0.18.1",
+    "bundlesize2": "^0.0.31",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "dns-packet": "^5.4.0",
