@@ -1,3 +1,4 @@
+import { Server } from '@chainlink/ccip-read-server';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ethers } from 'ethers';
@@ -26,7 +27,7 @@ const RESPONSES = {
 
 function makeQueryFunc(responses: {[qname: string]: {[qtype: string]: string}}) {
   return function(q: packet.Packet): Promise<packet.Packet> {
-      if(q.questions.length !== 1) {
+      if(q?.questions?.length !== 1) {
           throw new Error("Queries must have exactly one question"); 
       };
       const question = q.questions[0];
@@ -47,11 +48,11 @@ describe('ccip-read-dns-gateway', () => {
     it('responds to a DNS query correctly', async () => {
       const iface = new ethers.utils.Interface(abi);
       const calldata = iface.encodeFunctionData('resolve', [
-        packet.name.encode('example.com'),
+        (packet as any).name.encode('example.com'),
         'A'
       ]);
       const sendQuery = makeQueryFunc(RESPONSES);
-      await supertest(makeApp(sendQuery, '/'))
+      await supertest(makeApp(sendQuery, '/', Server))
         .get(`/${TEST_ADDRESS}/${calldata}.json`)
         .send()
         .expect(200)
