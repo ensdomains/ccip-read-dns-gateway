@@ -22,11 +22,10 @@ export function makeApp(
           Buffer.from(name.slice(2), 'hex')
         );
         const result = await prover.queryWithProof(qtype, decodedName);
-        const ret = [result.answer].concat(result.proofs).map(entry => ({
+        const ret = Array.prototype.concat(result.proofs, [result.answer]).map(entry => ({
           rrset: entry.toWire(),
           sig: entry.signature.data.signature,
         }));
-        console.log({ ret });
         return [ret];
       },
     },

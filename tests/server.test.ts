@@ -1,10 +1,11 @@
 import { Server } from '@chainlink/ccip-read-server';
-import chai from 'chai';
+import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ethers } from 'ethers';
 import supertest from 'supertest';
 import { makeApp } from '../src/app';
 import * as packet from 'dns-packet';
+import { SignedSet } from '@ensdomains/dnsprovejs';
 
 chai.use(chaiAsPromised);
 
@@ -39,6 +40,18 @@ function makeQueryFunc(responses: {[qname: string]: {[qtype: string]: string}}) 
   };
 }
 
+function compareSignedSets(ssdata: {rrset: string, sig: string}, adata: string) {
+  const signedset = deserializeSignedSet(ssdata);
+  const ssrecord = Object.assign({}, signedset.records[0], {ttl: undefined});
+  const answer = packet.decode(Buffer.from(adata, 'hex'));
+  const arecord = Object.assign({}, answer.answers?.[0] || {}, {ttl: undefined});
+  expect(arecord).to.deep.equal(ssrecord);
+}
+
+function deserializeSignedSet(data: {rrset: string, sig: string}): SignedSet<packet.Answer> {
+  return SignedSet.fromWire(Buffer.from(data.rrset.slice(2), 'hex'), Buffer.from(data.sig.slice(2), 'hex'));
+}
+
 describe('ccip-read-dns-gateway', () => {
   const abi = [
     'function resolve(bytes name, string qtype) returns(tuple(bytes rrset, bytes sig)[])',
@@ -61,8 +74,14 @@ describe('ccip-read-dns-gateway', () => {
           const responsedata = iface.decodeFunctionResult(
             'resolve',
             response.body.data
-          );
-          console.log(responsedata);
+          )[0];
+          expect(responsedata.length).to.equal(6);
+          compareSignedSets(responsedata[0], RESPONSES['.']['DNSKEY']);
+          compareSignedSets(responsedata[1], RESPONSES['com']['DS']);
+          compareSignedSets(responsedata[2], RESPONSES['com']['DNSKEY']);
+          compareSignedSets(responsedata[3], RESPONSES['example.com']['DS']);
+          compareSignedSets(responsedata[4], RESPONSES['example.com']['DNSKEY']);
+          compareSignedSets(responsedata[5], RESPONSES['example.com']['A']);
         });
     });
   });
