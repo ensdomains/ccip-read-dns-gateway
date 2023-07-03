@@ -3,9 +3,9 @@ import { dohQuery } from '@ensdomains/dnsprovejs';
 import { makeApp } from './app';
 
 const routeHandler = (env: any) => {
-  const { DOH_API } = env;
-  const app = makeApp(dohQuery(DOH_API as string), '/', Server);
-  console.log(`Serving with DoH Resolver ${DOH_API}`);
+  const { DOH_GATEWAY_URL } = env;
+  const app = makeApp(dohQuery(DOH_GATEWAY_URL as string), '/', Server);
+  console.log(`Serving with DoH Resolver ${DOH_GATEWAY_URL}`);
   return app;
 };
 
