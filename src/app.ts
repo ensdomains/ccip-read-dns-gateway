@@ -22,7 +22,10 @@ export function makeApp(
         const decodedName = packet.name.decode(
           Buffer.from(name.slice(2), 'hex')
         );
-        const result = await prover.queryWithProof(qTypes.toString(qtype), decodedName);
+        const result = await prover.queryWithProof(
+          qTypes.toString(qtype),
+          decodedName
+        );
         const ret = Array.prototype
           .concat(result.proofs, [result.answer])
           .map(entry => ({
