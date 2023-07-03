@@ -37,7 +37,7 @@ jobs:
           ref: 'dev'
 
       - name: Run local node
-        run: cd ./contracts && yarn && npx hardhat node --hostname 127.0.0.1
+        run: cd ./contracts && yarn && npx hardhat node --hostname 127.0.0.1 &
         env:
           BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
 
