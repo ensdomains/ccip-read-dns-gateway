@@ -31,7 +31,8 @@ jobs:
       - name: Run local node
         run: cd ./contracts && yarn && npx hardhat node &
 
-      - uses: iFaxity/wait-on-action
+      - name: Wait for local node
+        uses: iFaxity/wait-on-action@v1.1.0
         with:
           resource: http://127.0.0.1:8545/
 

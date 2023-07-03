@@ -3,6 +3,7 @@ on: [push]
 jobs:
   lint:
     name: Lint on Node 18.x
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
