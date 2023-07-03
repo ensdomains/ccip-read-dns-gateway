@@ -45,7 +45,7 @@ jobs:
         uses: iFaxity/wait-on-action@v1.1.0
         with:
           timeout: 120000
-          resource: 127.0.0.1:8545
+          resource: http://127.0.0.1:8545
 
       - name: Test
         run: yarn test --ci --coverage --maxWorkers=2
