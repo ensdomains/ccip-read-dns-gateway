@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Use Node ${{ matrix.node }}
         uses: actions/setup-node@v1
@@ -30,10 +30,11 @@ jobs:
         uses: bahmutov/npm-install@v1
 
       - name: Check out ENS contracts
-        uses: actions/checkout@dev
+        uses: actions/checkout@v3
         with:
           repository: ensdomains/ens-contracts
           path: './contracts'
+          ref: 'dev'
 
       - name: Run local node
         run: cd ./contracts && yarn && npx hardhat node --hostname 127.0.0.1
