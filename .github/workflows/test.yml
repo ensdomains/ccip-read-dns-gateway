@@ -29,12 +29,12 @@ jobs:
           path: './contracts'
 
       - name: Run local node
-        run: cd ./contracts && yarn && npx hardhat node --hostname 127.0.0.1 &
+        run: cd ./contracts && yarn && npx hardhat node --hostname 127.0.0.1
 
       - name: Wait for local node
         uses: iFaxity/wait-on-action@v1.1.0
         with:
-          timeout: 5000
+          timeout: 15000
           resource: 127.0.0.1:8545
 
       - name: Test
