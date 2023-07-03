@@ -30,7 +30,7 @@ jobs:
         uses: bahmutov/npm-install@v1
 
       - name: Check out ENS contracts
-        uses: actions/checkout@master
+        uses: actions/checkout@dev
         with:
           repository: ensdomains/ens-contracts
           path: './contracts'
