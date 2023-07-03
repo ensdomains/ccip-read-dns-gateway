@@ -1,7 +1,7 @@
 name: test CI
 on: [push]
 env:
-  BATCH_GATEWAY_URLS: ${{ vars.BATCH_GATEWAY_URLS }}
+  BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
   REGISTRAR_ADDRESS: ${{ vars.REGISTRAR_ADDRESS }}
   REGISTRY_ADDRESS: ${{ vars.REGISTRY_ADDRESS }}
   RESOLVER_ADDRESS: ${{ vars.RESOLVER_ADDRESS }}
@@ -38,6 +38,8 @@ jobs:
 
       - name: Run local node
         run: cd ./contracts && yarn && npx hardhat node --hostname 127.0.0.1
+        env:
+          BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
 
       - name: Wait for local node
         uses: iFaxity/wait-on-action@v1.1.0
