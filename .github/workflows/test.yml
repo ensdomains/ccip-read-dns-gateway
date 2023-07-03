@@ -1,4 +1,4 @@
-name: CI
+name: test CI
 on: [push]
 jobs:
   e2e:
