@@ -1,8 +1,8 @@
 name: CI
 on: [push]
 jobs:
-  build:
-    name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
+  e2e:
+    name: Run tests on Node ${{ matrix.node }} and ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -22,11 +22,15 @@ jobs:
       - name: Install deps and build (with cache)
         uses: bahmutov/npm-install@v1
 
-      - name: Lint
-        run: yarn lint
+      - name: Check out ENS contracts
+        uses: actions/checkout@master
+        with:
+          repository: ensdomains/ens-contracts
+          path: './contracts'
+
+      - name: Run local node
+        run: cd ./contracts && yarn && npx hardhat node &
 
       - name: Test
         run: yarn test --ci --coverage --maxWorkers=2
 
-      - name: Build
-        run: yarn build
