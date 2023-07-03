@@ -1,5 +1,12 @@
 name: test CI
 on: [push]
+env:
+  BATCH_GATEWAY_URLS: ${{ vars.BATCH_GATEWAY_URLS }}
+  REGISTRAR_ADDRESS: ${{ vars.REGISTRAR_ADDRESS }}
+  REGISTRY_ADDRESS: ${{ vars.REGISTRY_ADDRESS }}
+  RESOLVER_ADDRESS: ${{ vars.RESOLVER_ADDRESS }}
+  WRAPPER_ADDRESS: ${{ vars.WRAPPER_ADDRESS }}
+
 jobs:
   e2e:
     name: Run tests on Node ${{ matrix.node }} and ${{ matrix.os }}
@@ -39,4 +46,3 @@ jobs:
 
       - name: Test
         run: yarn test --ci --coverage --maxWorkers=2
-
