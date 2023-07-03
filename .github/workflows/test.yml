@@ -31,6 +31,10 @@ jobs:
       - name: Run local node
         run: cd ./contracts && yarn && npx hardhat node &
 
+      - uses: iFaxity/wait-on-action
+        with:
+          resource: http://127.0.0.1:8545/
+
       - name: Test
         run: yarn test --ci --coverage --maxWorkers=2
 
