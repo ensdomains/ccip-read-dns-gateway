@@ -194,7 +194,7 @@ describe('End to end test', () => {
     return ret;
   }
   const baseProvider = new ethers.providers.JsonRpcProvider(
-    'http://localhost:8545'
+    'http://127.0.0.1:8545'
   );
   const signer = baseProvider.getSigner();
   const proxyMiddleware = new RevertNormalisingMiddleware(baseProvider);
