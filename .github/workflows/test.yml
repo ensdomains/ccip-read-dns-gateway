@@ -3,6 +3,7 @@ on: [push]
 env:
   BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
   DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
+  HARDHAT_DISABLE_TELEMETRY_PROMPT: true
   REGISTRAR_ADDRESS: ${{ vars.REGISTRAR_ADDRESS }}
   REGISTRY_ADDRESS: ${{ vars.REGISTRY_ADDRESS }}
   RESOLVER_ADDRESS: ${{ vars.RESOLVER_ADDRESS }}
@@ -39,10 +40,13 @@ jobs:
 
       - name: Run local node on Windows
         if: runner.os == 'Windows'
-        run: Start-Job -ScriptBlock { cd ./contracts; yarn; npx hardhat node --hostname 127.0.0.1 }
+        run: |
+          $currentDir = (Get-Location).Path
+          Start-Job -ScriptBlock { param($dir) Set-Location -Path $dir; cd contracts; yarn; npx hardhat node --hostname '127.0.0.1' } -ArgumentList $currentDir
         env:
           BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
           DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
+          HARDHAT_DISABLE_TELEMETRY_PROMPT: true
 
       - name: Run local node on Unix
         if: runner.os != 'Windows'
