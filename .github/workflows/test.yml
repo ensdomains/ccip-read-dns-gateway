@@ -43,7 +43,7 @@ jobs:
         run: |
           $env:HARDHAT_DISABLE_TELEMETRY_PROMPT = "true"
           $currentDir = (Get-Location).Path
-          cd contracts; yarn; npx hardhat node --hostname '127.0.0.1'
+          Start-Job -ScriptBlock { param($dir) Set-Location -Path $dir; cd contracts; yarn; npx hardhat node --hostname '127.0.0.1' } -ArgumentList $currentDir
         env:
           BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
           DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
@@ -58,7 +58,7 @@ jobs:
       - name: Wait for local node
         uses: iFaxity/wait-on-action@v1.1.0
         with:
-          timeout: 300000
+          timeout: 900000
           window: 2000
           resource: http://127.0.0.1:8545
 
