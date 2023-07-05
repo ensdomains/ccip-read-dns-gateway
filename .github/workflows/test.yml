@@ -40,7 +40,7 @@ jobs:
 
       - name: Run local node on Windows
         if: runner.os == 'Windows'
-        run: cd contracts; yarn; $env:HARDHAT_DISABLE_TELEMETRY_PROMPT = "true"; $currentDir = (Get-Location).Path; $job = Start-Job -ScriptBlock { param($dir) Set-Location -Path $dir; npx hardhat node --hostname '127.0.0.1' } -ArgumentList $currentDir; Start-Sleep -Seconds 5; Receive-Job -Job $job -Keep
+        run: cd contracts; yarn --network-timeout 100000; $env:HARDHAT_DISABLE_TELEMETRY_PROMPT = "true"; $currentDir = (Get-Location).Path; $job = Start-Job -ScriptBlock { param($dir) Set-Location -Path $dir; npx hardhat node --hostname '127.0.0.1' } -ArgumentList $currentDir; Start-Sleep -Seconds 50; Receive-Job -Job $job -Keep
         env:
           BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
           DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
