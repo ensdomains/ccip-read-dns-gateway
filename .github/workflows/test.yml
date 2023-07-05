@@ -43,7 +43,7 @@ jobs:
         run: |
           $env:HARDHAT_DISABLE_TELEMETRY_PROMPT = "true"
           $currentDir = (Get-Location).Path
-          Start-Job -ScriptBlock { param($dir) Set-Location -Path $dir; cd contracts; yarn; npx hardhat node --hostname '127.0.0.1' } -ArgumentList $currentDir
+          cd contracts; yarn; npx hardhat node --hostname '127.0.0.1'
         env:
           BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
           DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
