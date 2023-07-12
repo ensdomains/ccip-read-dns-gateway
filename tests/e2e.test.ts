@@ -81,10 +81,13 @@ export class MockProvider extends BaseProvider {
     }
 
     let bytes = arrayify(result);
-    const { urls, callData } = CCIP_READ_INTERFACE.decodeErrorResult(
-      'OffchainLookup',
-      bytes
-    );
+    const {
+      urls,
+      callData,
+      callbackFunction,
+      extraData,
+    } = CCIP_READ_INTERFACE.decodeErrorResult('OffchainLookup', bytes);
+
     const response = await this.sendRPC(
       provider.fetcher,
       urls,
@@ -92,14 +95,17 @@ export class MockProvider extends BaseProvider {
       callData
     );
 
-    let encodedResult = ethers.utils.defaultAbiCoder.encode(
-      ['bytes'],
-      [response]
-    );
+    let encodedData = CCIP_READ_INTERFACE.encodeFunctionData(callbackFunction, [
+      response,
+      extraData,
+    ]);
+    params.transaction.data = encodedData;
+
+    let resultCallback = await provider.parent.perform('call', params);
 
     return {
       transaction: params.transaction,
-      result: encodedResult,
+      result: resultCallback,
     };
   }
 
@@ -185,10 +191,7 @@ describe('End to end test', () => {
     Server
   );
 
-  async function fetcher(
-    _url: string,
-    json?: string
-  ) {
+  async function fetcher(_url: string, json?: string) {
     const { sender: to, data } = JSON.parse(json as string);
     const ret = await supertest(server).get(`/${to}/${data}.json`);
     return ret;
@@ -248,18 +251,9 @@ describe('End to end test', () => {
       const dnsName = hexEncodeName(TEST_NAME);
       const response = await resolver.resolve(dnsName, callData);
 
-      const extraData = ethers.utils.defaultAbiCoder.encode(
-        ['bytes', 'bytes'],
-        [dnsName, callData]
-      );
-
-      const resultCallback = await resolver.resolveCallback(
-        response,
-        extraData
-      );
       const resultData = Resolver.decodeFunctionResult(
         'addr(bytes32)',
-        resultCallback
+        response
       );
 
       expect(resultData).to.deep.equal([TEST_ADDRESS]);
