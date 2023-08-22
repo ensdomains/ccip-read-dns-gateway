@@ -36,7 +36,7 @@ jobs:
         with:
           repository: ensdomains/ens-contracts
           path: './contracts'
-          ref: '787c5d8'
+          ref: 'dev'
 
       # - name: Run local node on Windows
       #   if: runner.os == 'Windows'
@@ -47,7 +47,7 @@ jobs:
 
       - name: Run local node on Unix
         if: runner.os != 'Windows'
-        run: cd ./contracts && yarn && npx hardhat node --hostname 127.0.0.1 &
+        run: cd ./contracts && git checkout 787c5d8 && yarn && npx hardhat node --hostname 127.0.0.1 &
         env:
           BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
           DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
