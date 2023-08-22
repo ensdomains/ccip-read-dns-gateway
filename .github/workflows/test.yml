@@ -36,7 +36,7 @@ jobs:
         with:
           repository: ensdomains/ens-contracts
           path: './contracts'
-          ref: 'dev'
+          ref: '787c5d8'
 
       # - name: Run local node on Windows
       #   if: runner.os == 'Windows'
