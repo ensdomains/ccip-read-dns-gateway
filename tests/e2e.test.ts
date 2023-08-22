@@ -72,7 +72,10 @@ export class MockProvider extends BaseProvider {
   ): Promise<{ transaction: TransactionRequest; result: BytesLike }> {
     let result = await provider.parent.perform('call', params);
 
-    if (!result.startsWith('0x556f1830') || result.length % 128 != 10) {
+    if (
+      !result.startsWith('0x556f1830') ||
+      ethers.utils.hexDataLength(result) % 32 != 4
+    ) {
       // iface: OffchainLookup(address,string[],bytes,bytes4,bytes)
       return {
         transaction: params.transaction,
