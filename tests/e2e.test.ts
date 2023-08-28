@@ -8,8 +8,8 @@ import { dohQuery } from '@ensdomains/dnsprovejs';
 import * as packet from 'dns-packet';
 import supertest from 'supertest';
 import { makeApp } from '../src/app';
-import OffchainDNSResolver_abi from '@ensdomains/ens-contracts/artifacts/contracts/dnsregistrar/OffchainDNSResolver.sol/OffchainDNSResolver.json';
-import Resolver_abi from '@ensdomains/ens-contracts/artifacts/contracts/resolvers/OwnedResolver.sol/OwnedResolver.json';
+import OffchainDNSResolver_abi from '../src/artifacts/OffchainDNSResolver.json';
+import Resolver_abi from '../src/artifacts/OwnedResolver.json';
 import {
   BaseProvider,
   BlockTag,

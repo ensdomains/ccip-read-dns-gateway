@@ -47,7 +47,7 @@ jobs:
 
       - name: Run local node on Unix
         if: runner.os != 'Windows'
-        run: cd ./contracts && git checkout 787c5d8 && yarn && npx hardhat node --hostname 127.0.0.1 &
+        run: cd ./contracts && git checkout 6b9aaae && yarn && npx hardhat node --hostname 127.0.0.1 &
         env:
           BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
           DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
