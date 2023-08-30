@@ -1,103 +1,42 @@
-# TSDX User Guide
+# CCIP-Read-DNS-Gateway: Your Gasless DNSSEC Support
 
-Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let’s get you oriented with what’s here and how to use it.
+Welcome aboard the CCIP-Read-DNS-Gateway! This isn't just any gateway, it's a special server that provides DNS resolution services for ENS domains, with a focus on gasless DNSSEC support. 
 
-> This TSDX setup is meant for developing libraries (not apps!) that can be published to NPM. If you’re looking to build a Node app, you could use `ts-node-dev`, plain `ts-node`, or simple `tsc`.
+## Inside the Gateway
 
-> If you’re new to TypeScript, checkout [this handy cheatsheet](https://devhints.io/typescript)
+Let's take a quick look at what makes this gateway tick:
 
-## Commands
+- `index.ts`: This is the starting point for our application. It sets up the DNS prover with a specified DoH gateway URL and gets the server up and running.
 
-TSDX scaffolds your new library inside `/src`.
+- `app.ts`: This is where the server gets its instructions. It sets up the server with the necessary routes and handlers, and uses the `@ensdomains/dnsprovejs` library to perform DNS queries and proofs.
 
-To run TSDX, use:
+- `worker.ts`: This is our diligent Cloudflare worker, ready to handle incoming requests and direct them to the appropriate handlers. Useful for [getting started fast](#gateway-server).
 
-```bash
-npm start # or yarn start
-```
+## Ready to Get Started?
 
-This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
+### I will run in local
 
-To do a one-off build, use `npm run build` or `yarn build`.
+To run this server locally, you'll need to provide a DoH (DNS over HTTPS) gateway URL. Set the DOH_GATEWAY_URL environment variable and you're all set! The server will use this gateway to perform DNS queries.
 
-To run tests, use `npm test` or `yarn test`.
+Once you're ready, just run the index.ts file. You'll be up and running on port 8080 (default).
 
-## Configuration
+### I will run as Cloudflare Worker
 
-Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
+If you want to run this as a Cloudflare Worker, the process is slightly different, but still super easy.
 
-### Jest
+First, you'll need to install wrangler on your machine. You can do this by following the instructions [here](https://developers.cloudflare.com/workers/wrangler/install-and-update/#install-wrangler-globally).
 
-Jest tests are set up to run with `npm test` or `yarn test`.
+Once wrangler is installed, use wrangler login to configure your account.
 
-### Bundle Analysis
+Next, navigate to the wrangler.toml file and update the DOH_GATEWAY_URL environment variable with the DoH server you want to use.
 
-[`size-limit`](https://github.com/ai/size-limit) is set up to calculate the real cost of your library with `npm run size` and visualize the bundle with `npm run analyze`.
+Finally, run `wrangler publish` and voila! Your Cloudflare worker is up and running. Easy peasy!
 
-#### Setup Files
+## Our Companions
 
-This is the folder structure we set up for you:
+We've got some great companions on this journey:
 
-```txt
-/src
-  index.tsx       # EDIT THIS
-/test
-  blah.test.tsx   # EDIT THIS
-.gitignore
-package.json
-README.md         # EDIT THIS
-tsconfig.json
-```
+- [`@ensdomains/dnsprovejs`](https://github.com/ensdomains/dnsprovejs): Our reliable ally for DNS proofs.
+- [`@chainlink/ccip-read-server`](https://github.com/smartcontractkit/ccip-read): Sets the stage for a CCIP read server.
 
-### Rollup
-
-TSDX uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rollup configs for various module formats and build settings. See [Optimizations](#optimizations) for details.
-
-### TypeScript
-
-`tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
-
-## Continuous Integration
-
-### GitHub Actions
-
-Two actions are added by default:
-
-- `main` which installs deps w/ cache, lints, tests, and builds on all pushes against a Node and OS matrix
-- `size` which comments cost comparison of your library on every pull request using [`size-limit`](https://github.com/ai/size-limit)
-
-## Optimizations
-
-Please see the main `tsdx` [optimizations docs](https://github.com/palmerhq/tsdx#optimizations). In particular, know that you can take advantage of development-only optimizations:
-
-```js
-// ./types/index.d.ts
-declare var __DEV__: boolean;
-
-// inside your code...
-if (__DEV__) {
-  console.log('foo');
-}
-```
-
-You can also choose to install and use [invariant](https://github.com/palmerhq/tsdx#invariant) and [warning](https://github.com/palmerhq/tsdx#warning) functions.
-
-## Module Formats
-
-CJS, ESModules, and UMD module formats are supported.
-
-The appropriate paths are configured in `package.json` and `dist/index.js` accordingly. Please report if any issues are found.
-
-## Named Exports
-
-Per Palmer Group guidelines, [always use named exports.](https://github.com/palmerhq/typescript#exports) Code split inside your React app instead of your React library.
-
-## Including Styles
-
-There are many ways to ship styles, including with CSS-in-JS. TSDX has no opinion on this, configure how you like.
-
-For vanilla CSS, you can include it at the root directory and add it to the `files` section in your `package.json`, so that it can be imported separately by your users and run through their bundler's loader.
-
-## Publishing to NPM
-
-We recommend using [np](https://github.com/sindresorhus/np).
+Remember, this is just a quick overview. For a deeper understanding, feel free to explore the source code. Happy coding!

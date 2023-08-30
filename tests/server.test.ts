@@ -5,6 +5,7 @@ import { ethers } from 'ethers';
 import supertest from 'supertest';
 import { makeApp } from '../src/app';
 import * as packet from 'dns-packet';
+import * as qTypes from 'dns-packet/types';
 import { SignedSet } from '@ensdomains/dnsprovejs';
 
 chai.use(chaiAsPromised);
@@ -54,7 +55,7 @@ function deserializeSignedSet(data: {rrset: string, sig: string}): SignedSet<pac
 
 describe('ccip-read-dns-gateway', () => {
   const abi = [
-    'function resolve(bytes name, string qtype) returns(tuple(bytes rrset, bytes sig)[])',
+    'function resolve(bytes name, uint16 qtype) returns(tuple(bytes rrset, bytes sig)[])',
   ];
 
   describe('end-to-end tests', () => {
@@ -62,7 +63,7 @@ describe('ccip-read-dns-gateway', () => {
       const iface = new ethers.utils.Interface(abi);
       const calldata = iface.encodeFunctionData('resolve', [
         (packet as any).name.encode('example.com'),
-        'A'
+        qTypes.toType('A') // class inet 'A'
       ]);
       const sendQuery = makeQueryFunc(RESPONSES);
       await supertest(makeApp(sendQuery, '/', Server))

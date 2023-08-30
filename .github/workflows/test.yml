@@ -1,0 +1,63 @@
+name: test CI
+on: [push]
+env:
+  BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
+  DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
+  HARDHAT_DISABLE_TELEMETRY_PROMPT: true
+  REGISTRAR_ADDRESS: ${{ vars.REGISTRAR_ADDRESS }}
+  REGISTRY_ADDRESS: ${{ vars.REGISTRY_ADDRESS }}
+  RESOLVER_ADDRESS: ${{ vars.RESOLVER_ADDRESS }}
+  WRAPPER_ADDRESS: ${{ vars.WRAPPER_ADDRESS }}
+
+jobs:
+  e2e:
+    name: Run tests on Node ${{ matrix.node }} and ${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node: ['16.7.x', '18.15.x']
+        os: [ubuntu-latest, macOS-latest]
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Use Node ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install deps and build (with cache)
+        uses: bahmutov/npm-install@v1
+
+      - name: Check out ENS contracts
+        uses: actions/checkout@v3
+        with:
+          repository: ensdomains/ens-contracts
+          path: './contracts'
+          ref: '6b9aaae963f71792ab1a75de61d5151ff1d1b7e3'
+
+      # - name: Run local node on Windows
+      #   if: runner.os == 'Windows'
+      #   run: cd contracts; yarn --network-timeout 100000; $env:HARDHAT_DISABLE_TELEMETRY_PROMPT = "true"; $currentDir = (Get-Location).Path; $job = Start-Job -ScriptBlock { param($dir) Set-Location -Path $dir; npx hardhat node --hostname '127.0.0.1' } -ArgumentList $currentDir; Start-Sleep -Seconds 50; Receive-Job -Job $job -Keep
+      #   env:
+      #     BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
+      #     DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
+
+      - name: Run local node on Unix
+        if: runner.os != 'Windows'
+        run: cd ./contracts && yarn && npx hardhat node --hostname 127.0.0.1 &
+        env:
+          BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
+          DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
+
+      - name: Wait for local node
+        uses: iFaxity/wait-on-action@v1.1.0
+        with:
+          timeout: 900000
+          window: 2000
+          resource: http://127.0.0.1:8545
+
+      - name: Test
+        run: yarn test --ci --coverage --maxWorkers=2

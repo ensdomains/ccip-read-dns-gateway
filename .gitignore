@@ -1,5 +1,7 @@
 *.log
 .DS_Store
 .dev.vars
+.env
 node_modules
+coverage
 dist

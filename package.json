@@ -28,6 +28,12 @@
       "pre-commit": "tsdx lint"
     }
   },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.ts"
+    ],
+    "testTimeout": 20000
+  },
   "prettier": {
     "printWidth": 80,
     "semi": true,
@@ -48,6 +54,7 @@
   ],
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230214.0",
+    "@ensdomains/ens-contracts": "^0.0.21",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
     "@types/dns-packet": "^5.2.4",
@@ -56,6 +63,7 @@
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "dns-packet": "^5.4.0",
+    "ganache": "^7.8.0",
     "husky": "^8.0.3",
     "supertest": "^6.1.6",
     "tsdx": "^0.14.1",
@@ -68,7 +76,10 @@
     "@ensdomains/ccip-read-cf-worker": "^0.0.1",
     "@ensdomains/dnsprovejs": "^0.4.1",
     "dotenv": "^16.0.3",
-    "ethers": "^5.4.4",
+    "ethers": "^5.7.2",
     "node-fetch": "2.6.1"
+  },
+  "volta": {
+    "node": "16.15.1"
   }
 }

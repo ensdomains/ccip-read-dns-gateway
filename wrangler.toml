@@ -11,4 +11,4 @@ port = 8000
 command = "yarn build"
 
 [vars]
-DOH_API="https://cloudflare-dns.com/dns-query"
+DOH_GATEWAY_URL="https://cloudflare-dns.com/dns-query"
