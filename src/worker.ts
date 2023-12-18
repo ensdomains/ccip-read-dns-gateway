@@ -27,6 +27,22 @@ const routeHandler = (env: ENV, trackEvent?: Function) => {
   return app;
 };
 
+const logResult = async (request, result: Response) => {
+  if (!result.body) {
+    return result;
+  }
+  const [streamForLog, streamForResult] = result.body.tee();
+  const logResult = await new Response(streamForLog).json();
+
+  await tracker.trackEvent(
+    request,
+    'result',
+    { props: { result: logResult.data.substring(0, 200) } },
+    true
+  );
+  return new Response(streamForResult, result);
+};
+
 module.exports = {
   fetch: async function(
     request: CFWRequest,
@@ -36,6 +52,6 @@ module.exports = {
     await tracker.trackEvent(request, 'request', {}, true);
     await tracker.trackPageview(request, {}, true);
     const router = routeHandler(env, tracker.trackEvent.bind(tracker, request));
-    return await router.handle(request);
+    return router.handle(request).then(logResult.bind(this, request));
   },
 };
