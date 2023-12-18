@@ -6,7 +6,8 @@ import * as qTypes from 'dns-packet/types';
 export function makeApp(
   sendQuery: ConstructorParameters<typeof DNSProver>[0],
   path: string,
-  Server: any
+  Server: any,
+  trackEvent?: Function
 ) {
   const prover = new DNSProver(sendQuery);
 
@@ -22,6 +23,13 @@ export function makeApp(
         const decodedName = packet.name.decode(
           Buffer.from(name.slice(2), 'hex')
         );
+
+        if (trackEvent) {
+          trackEvent('resolve', {
+            props: { name: decodedName, qtype: qTypes.toString(qtype) },
+          }, true);
+        }
+
         const result = await prover.queryWithProof(
           qTypes.toString(qtype),
           decodedName
