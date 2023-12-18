@@ -20,14 +20,18 @@ export function makeApp(
       type: 'resolve',
       func: async (args: ethers.utils.Result) => {
         const [name, qtype] = args;
-        const decodedName = packet.name.decode(
+        const decodedName = (packet as any).name.decode(
           Buffer.from(name.slice(2), 'hex')
         );
 
         if (trackEvent) {
-          trackEvent('resolve', {
-            props: { name: decodedName, qtype: qTypes.toString(qtype) },
-          }, true);
+          trackEvent(
+            'resolve',
+            {
+              props: { name: decodedName, qtype: qTypes.toString(qtype) },
+            },
+            true
+          );
         }
 
         const result = await prover.queryWithProof(

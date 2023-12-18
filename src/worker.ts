@@ -11,7 +11,9 @@ interface ENV {
   DOH_GATEWAY_URL: string;
 }
 
-const tracker = new Tracker('ccip-read-dns-worker.ens-cf.workers.dev', { enableLogging: true });
+const tracker = new Tracker('ccip-read-dns-worker.ens-cf.workers.dev', {
+  enableLogging: true,
+});
 
 const routeHandler = (env: ENV, trackEvent?: Function) => {
   const { DOH_GATEWAY_URL } = env;

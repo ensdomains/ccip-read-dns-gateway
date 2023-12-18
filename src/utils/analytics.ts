@@ -67,11 +67,8 @@ export class Tracker {
 
       const requestInfo = 'originalUrl' in req ? req : req.headers;
 
-      if (
-        requestInfo.get('Referrer')
-      ) {
-        body.referrer = requestInfo.get('Referrer') ||
-          '';
+      if (requestInfo.get('Referrer')) {
+        body.referrer = requestInfo.get('Referrer') || '';
       }
 
       if (props) {
