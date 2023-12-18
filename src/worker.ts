@@ -27,7 +27,7 @@ const routeHandler = (env: ENV, trackEvent?: Function) => {
   return app;
 };
 
-const logResult = async (request, result: Response) => {
+const logResult = async (request: CFWRequest, result: Response) => {
   if (!result.body) {
     return result;
   }
