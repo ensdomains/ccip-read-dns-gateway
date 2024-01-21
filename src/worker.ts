@@ -9,9 +9,10 @@ import { Tracker } from './utils/analytics';
 
 interface ENV {
   DOH_GATEWAY_URL: string;
+  PLAUSIBLE_BASE_URL: string;
 }
 
-const tracker = new Tracker('ccip-read-dns-worker.ens-cf.workers.dev', {
+const tracker = new Tracker('ccip-read-dns-worker.ensdomains.workers.dev', {
   enableLogging: true,
 });
 
@@ -32,7 +33,7 @@ const logResult = async (request: CFWRequest, result: Response) => {
     return result;
   }
   const [streamForLog, streamForResult] = result.body.tee();
-  const logResult = await new Response(streamForLog).json();
+  const logResult: { data: string } = await new Response(streamForLog).json();
 
   await tracker.trackEvent(
     request,
@@ -49,6 +50,9 @@ module.exports = {
     env: ENV,
     _context: ExecutionContext
   ) {
+    if (env.PLAUSIBLE_BASE_URL) {
+      tracker.apiEndpoint = env.PLAUSIBLE_BASE_URL;
+    }
     await tracker.trackEvent(request, 'request', {}, true);
     await tracker.trackPageview(request, {}, true);
     const router = routeHandler(env, tracker.trackEvent.bind(tracker, request));
