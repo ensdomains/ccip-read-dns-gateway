@@ -12,7 +12,7 @@ interface ENV {
   PLAUSIBLE_BASE_URL: string;
 }
 
-const tracker = new Tracker('ccip-read-dns-worker.ensdomains.workers.dev', {
+const tracker = new Tracker('ccip-read-dns-worker.ens-cf.workers.dev/', {
   enableLogging: true,
 });
 
