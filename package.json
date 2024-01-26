@@ -53,7 +53,7 @@
     }
   ],
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20231121.0",
+    "@cloudflare/workers-types": "^4.20240117.0",
     "@ensdomains/ens-contracts": "^0.0.21",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
@@ -76,6 +76,7 @@
     "@chainlink/ccip-read-server": "^0.2.1",
     "@ensdomains/ccip-read-cf-worker": "^0.0.3",
     "@ensdomains/dnsprovejs": "^0.4.1",
+    "@ensdomains/server-analytics": "^0.0.1-alpha.2",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "node-fetch": "2.6.1"

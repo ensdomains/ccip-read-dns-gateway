@@ -3,9 +3,9 @@ import {
   ExecutionContext,
 } from '@cloudflare/workers-types';
 import { Server } from '@ensdomains/ccip-read-cf-worker';
+import { Tracker } from '@ensdomains/server-analytics';
 import { dohQuery } from '@ensdomains/dnsprovejs';
 import { makeApp } from './app';
-import { Tracker } from './utils/analytics';
 
 interface ENV {
   DOH_GATEWAY_URL: string;

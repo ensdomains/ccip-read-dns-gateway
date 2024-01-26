@@ -951,10 +951,10 @@
     ethers "^5.3.1"
     express "^4.17.1"
 
-"@cloudflare/workers-types@^4.20231121.0":
-  version "4.20231121.0"
-  resolved "https://registry.yarnpkg.com/@cloudflare/workers-types/-/workers-types-4.20231121.0.tgz#6a1c0bfc93aca4643d43f6439cfb7aca8058f289"
-  integrity sha512-+kWfpCkqiepwAKXyHoE0gnkPgkLhz0/9HOBIGhHRsUvUKvhUtm3mbqqoGRWgF1qcjzrDUBbrrOq4MYHfFtc2RA==
+"@cloudflare/workers-types@^4.20240117.0":
+  version "4.20240117.0"
+  resolved "https://registry.yarnpkg.com/@cloudflare/workers-types/-/workers-types-4.20240117.0.tgz#6cadb53017488ea4258dfd4fb589562d3b85a597"
+  integrity sha512-HQU8lJhaJVh8gQXFtVA7lZwd0hK1ckIFjRuxOXkVN2Z9t7DtzNbA2YTwBry5thKNgF5EwjN4THjHg5NUZzj05A==
 
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
@@ -995,6 +995,14 @@
     "@ensdomains/solsha1" "0.0.3"
     "@openzeppelin/contracts" "^4.1.0"
     dns-packet "^5.3.0"
+
+"@ensdomains/server-analytics@^0.0.1-alpha.2":
+  version "0.0.1-alpha.2"
+  resolved "https://registry.yarnpkg.com/@ensdomains/server-analytics/-/server-analytics-0.0.1-alpha.2.tgz#6a7df23be69e03ebd6426fe43a48a60ed9f242b0"
+  integrity sha512-ewXfZzp/YGoEo4/OKBx6olT7h/P6X01EZ7B4D8ZjFTa4sLzAufQK1qnjHY+SdE6LJ/gAlJX5nl62agtPjVKUGg==
+  dependencies:
+    "@cloudflare/workers-types" "^4.20240117.0"
+    express "^4.18.2"
 
 "@ensdomains/solsha1@0.0.3":
   version "0.0.3"
@@ -4208,7 +4216,7 @@ expect@^25.5.0:
     jest-message-util "^25.5.0"
     jest-regex-util "^25.2.6"
 
-express@^4.17.1:
+express@^4.17.1, express@^4.18.2:
   version "4.18.2"
   resolved "https://registry.npmjs.org/express/-/express-4.18.2.tgz"
   integrity sha512-5/PsL6iGPdfQ/lKM1UuielYgv3BUoJfz1aUwU9vHZ+J7gyvwdQXFEBIEIaxeGf0GIcreATNyBExtalisDbuMqQ==
