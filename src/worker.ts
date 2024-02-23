@@ -34,6 +34,7 @@ const logResult = async (request: CFWRequest, result: Response) => {
   }
   const [streamForLog, streamForResult] = result.body.tee();
   try {
+    const logResult: { data: string } = await new Response(streamForLog).json();
     const logResult: { data: string } = await new Response(
       streamForLog
     ).json();
