@@ -33,14 +33,20 @@ const logResult = async (request: CFWRequest, result: Response) => {
     return result;
   }
   const [streamForLog, streamForResult] = result.body.tee();
-  const logResult: { data: string } = await new Response(streamForLog).json();
+  try {
+    const logResult: { data: string } = await new Response(
+      streamForLog
+    ).json();
 
-  await tracker.trackEvent(
-    request,
-    'result',
-    { props: { result: logResult.data.substring(0, 200) } },
-    true
-  );
+    await tracker.trackEvent(
+      request,
+      'result',
+      { props: { result: logResult.data.substring(0, 200) } },
+      true
+    );
+  } catch (error) {
+    console.log('error logging result:', error);
+  }
   return new Response(streamForResult, result);
 };
 
