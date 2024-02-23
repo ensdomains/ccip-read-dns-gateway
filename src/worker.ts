@@ -39,7 +39,7 @@ const logResult = async (request: CFWRequest, result: Response) => {
     await tracker.trackEvent(
       request,
       'result',
-      { props: { result: logResult.data.substring(0, 200) } },
+      { props: { result: resultForLog.data.substring(0, 200) } },
       true
     );
   } catch (error) {
