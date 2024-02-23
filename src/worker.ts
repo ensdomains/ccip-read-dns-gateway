@@ -34,7 +34,9 @@ const logResult = async (request: CFWRequest, result: Response) => {
   }
   const [streamForLog, streamForResult] = result.body.tee();
   try {
-    const resultForLog: { data: string } = await new Response(streamForLog).json();
+    const resultForLog: { data: string } = await new Response(
+      streamForLog
+    ).json();
 
     await tracker.trackEvent(
       request,
