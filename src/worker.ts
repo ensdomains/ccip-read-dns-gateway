@@ -5,12 +5,24 @@ import {
 import { Server } from '@ensdomains/ccip-read-cf-worker';
 import { Tracker } from '@ensdomains/server-analytics';
 import { dohQuery } from '@ensdomains/dnsprovejs';
+import { ethers } from 'ethers';
 import { makeApp } from './app';
+import { extractENSRecord } from './utils';
 
 interface ENV {
   DOH_GATEWAY_URL: string;
   PLAUSIBLE_BASE_URL: string;
 }
+
+const abi_RRSetWithSignature = [
+  ethers.utils.ParamType.from({
+    components: [
+      { type: 'bytes', name: 'rrset' },
+      { type: 'bytes', name: 'sig' },
+    ],
+    type: 'tuple[]',
+  }),
+];
 
 const tracker = new Tracker('ccip-read-dns-worker.ens-cf.workers.dev', {
   enableLogging: true,
@@ -28,26 +40,16 @@ const routeHandler = (env: ENV, trackEvent?: Function) => {
   return app;
 };
 
-const logResult = async (request: CFWRequest, result: Response) => {
-  if (!result.body) {
-    return result;
-  }
-  const [streamForLog, streamForResult] = result.body.tee();
-  try {
-    const resultForLog: { data: string } = await new Response(
-      streamForLog
-    ).json();
-
-    await tracker.trackEvent(
-      request,
-      'result',
-      { props: { result: resultForLog.data.substring(0, 200) } },
-      true
-    );
-  } catch (error) {
-    console.log('error logging result:', error);
-  }
-  return new Response(streamForResult, result);
+const dataDecoder = async (data: string) => {
+  const decodedData = ethers.utils.defaultAbiCoder.decode(
+    abi_RRSetWithSignature,
+    data
+  )[0];
+  const structuredData = decodedData.map((item: string[]) => ({
+    rrset: item[0],
+    sig: item[1],
+  }));
+  return extractENSRecord(structuredData);
 };
 
 module.exports = {
@@ -62,6 +64,8 @@ module.exports = {
     await tracker.trackEvent(request, 'request', {}, true);
     await tracker.trackPageview(request, {}, true);
     const router = routeHandler(env, tracker.trackEvent.bind(tracker, request));
-    return router.handle(request).then(logResult.bind(this, request));
+    return router
+      .handle(request)
+      .then(tracker.logResult.bind(this, request, dataDecoder));
   },
 };
