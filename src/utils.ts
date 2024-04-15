@@ -49,4 +49,3 @@ export function extractENSRecord(dnsRecords: DNSRecord[]): string[] {
 
   return txtRecords;
 }
-
