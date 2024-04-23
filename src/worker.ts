@@ -40,7 +40,7 @@ const routeHandler = (env: ENV, trackEvent?: Function) => {
   return app;
 };
 
-const dataDecoder = async (data: string) => {
+const dataDecoder = async (_:CFWRequest, data: string) => {
   const decodedData = ethers.utils.defaultAbiCoder.decode(
     abi_RRSetWithSignature,
     data
@@ -49,7 +49,7 @@ const dataDecoder = async (data: string) => {
     rrset: item[0],
     sig: item[1],
   }));
-  return extractENSRecord(structuredData);
+  return { result: extractENSRecord(structuredData) };
 };
 
 module.exports = {
