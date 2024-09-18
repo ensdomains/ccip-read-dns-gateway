@@ -1,6 +1,6 @@
 import {
   Request as CFWRequest,
-  type ExecutionContext,
+  ExecutionContext,
 } from '@cloudflare/workers-types';
 import { Server } from '@ensdomains/ccip-read-cf-worker';
 import { PropsDecoder, Tracker } from '@ensdomains/server-analytics';
