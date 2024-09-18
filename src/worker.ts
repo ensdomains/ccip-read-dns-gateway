@@ -1,9 +1,9 @@
 import {
   Request as CFWRequest,
-  ExecutionContext,
+  type ExecutionContext,
 } from '@cloudflare/workers-types';
 import { Server } from '@ensdomains/ccip-read-cf-worker';
-import { Tracker } from '@ensdomains/server-analytics';
+import { PropsDecoder, Tracker } from '@ensdomains/server-analytics';
 import { dohQuery } from '@ensdomains/dnsprovejs';
 import { ethers } from 'ethers';
 import { makeApp } from './app';
@@ -24,9 +24,12 @@ const abi_RRSetWithSignature = [
   }),
 ];
 
-const tracker = new Tracker('ccip-read-dns-worker.ens-cf.workers.dev', {
-  enableLogging: true,
-});
+const tracker = new Tracker<CFWRequest>(
+  'ccip-read-dns-worker.ens-cf.workers.dev',
+  {
+    enableLogging: true,
+  }
+);
 
 const routeHandler = (env: ENV, trackEvent?: Function) => {
   const { DOH_GATEWAY_URL } = env;
@@ -40,7 +43,12 @@ const routeHandler = (env: ENV, trackEvent?: Function) => {
   return app;
 };
 
-const dataDecoder = async (_:CFWRequest, data: string) => {
+const propsDecoder: PropsDecoder<CFWRequest> = (
+  _: CFWRequest | unknown,
+  data?: string
+) => {
+  if (!data) return {};
+
   const decodedData = ethers.utils.defaultAbiCoder.decode(
     abi_RRSetWithSignature,
     data
@@ -66,6 +74,6 @@ module.exports = {
     const router = routeHandler(env, tracker.trackEvent.bind(tracker, request));
     return router
       .handle(request)
-      .then(tracker.logResult.bind(this, request, dataDecoder));
+      .then(tracker.logResult.bind(this, propsDecoder, request));
   },
 };
