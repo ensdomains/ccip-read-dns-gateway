@@ -53,7 +53,7 @@ jobs:
           DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
 
       - name: Wait for local node
-        uses: iFaxity/wait-on-action@v1.1.0
+        uses: iFaxity/wait-on-action@v1.2.1
         with:
           timeout: 900000
           window: 2000
