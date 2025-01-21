@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: ['16.7.x', '18.15.x']
+        node: ['18.x']
         os: [ubuntu-latest, macOS-latest]
 
     steps:
@@ -38,26 +38,50 @@ jobs:
           path: './contracts'
           ref: '6b9aaae963f71792ab1a75de61d5151ff1d1b7e3'
 
-      # - name: Run local node on Windows
-      #   if: runner.os == 'Windows'
-      #   run: cd contracts; yarn --network-timeout 100000; $env:HARDHAT_DISABLE_TELEMETRY_PROMPT = "true"; $currentDir = (Get-Location).Path; $job = Start-Job -ScriptBlock { param($dir) Set-Location -Path $dir; npx hardhat node --hostname '127.0.0.1' } -ArgumentList $currentDir; Start-Sleep -Seconds 50; Receive-Job -Job $job -Keep
-      #   env:
-      #     BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
-      #     DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
-
-      - name: Run local node on Unix
-        if: runner.os != 'Windows'
-        run: cd ./contracts && yarn && npx hardhat node --hostname 127.0.0.1 &
+      - name: Run local node
+        run: |
+          cd ./contracts
+          yarn
+          npx hardhat node --hostname 127.0.0.1 > hardhat_output.log 2>&1 &
+          echo $! > hardhat_pid.txt
         env:
           BATCH_GATEWAY_URLS: '["https://universal-offchain-unwrapper.ens-cf.workers.dev/"]'
           DOH_GATEWAY_URL: 'https://cloudflare-dns.com/dns-query'
 
       - name: Wait for local node
-        uses: iFaxity/wait-on-action@v1.1.0
-        with:
-          timeout: 900000
-          window: 2000
-          resource: http://127.0.0.1:8545
+        run: |
+          timeout=300
+          while true; do
+            if [ $timeout -le 0 ]; then
+              echo "Timeout waiting for Hardhat node"
+              cat hardhat_output.log
+              exit 1
+            fi
+            if nc -z localhost 8545 2>/dev/null; then
+              echo "Hardhat node is up and running"
+              break
+            fi
+            echo "Waiting for Hardhat node... ($timeout seconds left)"
+            sleep 5
+            timeout=$((timeout - 5))
+          done
+        shell: bash
 
       - name: Test
         run: yarn test --ci --coverage --maxWorkers=2
+
+      - name: Upload Hardhat logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hardhat-logs
+          path: ./contracts/hardhat_output.log
+
+      - name: Cleanup Hardhat process
+        if: always()
+        run: |
+          if [ -f ./contracts/hardhat_pid.txt ]; then
+            pid=$(cat ./contracts/hardhat_pid.txt)
+            kill $pid 2>/dev/null || true
+          fi
+        shell: bash

@@ -1,42 +1,81 @@
-# CCIP-Read-DNS-Gateway: Your Gasless DNSSEC Support
+# CCIP-Read-DNS-Gateway
 
-Welcome aboard the CCIP-Read-DNS-Gateway! This isn't just any gateway, it's a special server that provides DNS resolution services for ENS domains, with a focus on gasless DNSSEC support. 
+## Overview
 
-## Inside the Gateway
+CCIP-Read-DNS-Gateway is a specialized server providing DNS resolution services for ENS domains with a focus on gasless DNSSEC support. It leverages the CCIP-Read protocol to offer efficient, off-chain DNS resolution and DNSSEC validation.
 
-Let's take a quick look at what makes this gateway tick:
+## Core Components
 
-- `index.ts`: This is the starting point for our application. It sets up the DNS prover with a specified DoH gateway URL and gets the server up and running.
+- `index.ts`: Express server for handling incoming requests. Mostly suitable for self-hosting or cloud development.
+- `worker.ts`: Cloudflare worker script for handling incoming requests in a (Cloudflare Worker) serverless environment.
 
-- `app.ts`: This is where the server gets its instructions. It sets up the server with the necessary routes and handlers, and uses the `@ensdomains/dnsprovejs` library to perform DNS queries and proofs.
+- `app.ts`: Configures server routes and handlers. Utilizes the `@ensdomains/dnsprovejs` library for DNS queries and proof generation.
 
-- `worker.ts`: This is our diligent Cloudflare worker, ready to handle incoming requests and direct them to the appropriate handlers. Useful for [getting started fast](#gateway-server).
+## Installation
 
-## Ready to Get Started?
+```bash
+git clone https://github.com/your-repo/ccip-read-dns-gateway.git
+cd ccip-read-dns-gateway
+npm install
+```
 
-### I will run in local
+## Configuration
 
-To run this server locally, you'll need to provide a DoH (DNS over HTTPS) gateway URL. Set the DOH_GATEWAY_URL environment variable and you're all set! The server will use this gateway to perform DNS queries.
+Set the `DOH_GATEWAY_URL` environment variable to specify your DNS-over-HTTPS gateway:
 
-Once you're ready, just run the index.ts file. You'll be up and running on port 8080 (default).
+```bash
+export DOH_GATEWAY_URL=https://your-doh-gateway.com/dns-query
+```
 
-### I will run as Cloudflare Worker
+## Usage
 
-If you want to run this as a Cloudflare Worker, the process is slightly different, but still super easy.
+### Local Development
 
-First, you'll need to install wrangler on your machine. You can do this by following the instructions [here](https://developers.cloudflare.com/workers/wrangler/install-and-update/#install-wrangler-globally).
+To run the server locally:
 
-Once wrangler is installed, use wrangler login to configure your account.
+```bash
+npm start
+```
 
-Next, navigate to the wrangler.toml file and update the DOH_GATEWAY_URL environment variable with the DoH server you want to use.
+The server will start on `http://localhost:8080` by default.
 
-Finally, run `wrangler publish` and voila! Your Cloudflare worker is up and running. Easy peasy!
+### Cloudflare Worker Deployment
 
-## Our Companions
+1. Install Wrangler CLI:
+   ```bash
+   npm install -g @cloudflare/wrangler
+   ```
 
-We've got some great companions on this journey:
+2. Authenticate with your Cloudflare account:
+   ```bash
+   wrangler login
+   ```
 
-- [`@ensdomains/dnsprovejs`](https://github.com/ensdomains/dnsprovejs): Our reliable ally for DNS proofs.
-- [`@chainlink/ccip-read-server`](https://github.com/smartcontractkit/ccip-read): Sets the stage for a CCIP read server.
+3. Update `wrangler.toml` with your DoH gateway URL:
+   ```toml
+   [vars]
+   DOH_GATEWAY_URL = "https://your-doh-gateway.com/dns-query"
+   ```
 
-Remember, this is just a quick overview. For a deeper understanding, feel free to explore the source code. Happy coding!
+4. Deploy the worker:
+   ```bash
+   wrangler publish
+   ```
+
+## API Endpoints
+
+- `GET /`: Health check endpoint
+- `POST /`: Main endpoint for DNS resolution and proof generation
+
+## Dependencies
+
+- [`@ensdomains/dnsprovejs`](https://github.com/ensdomains/dnsprovejs): Library for DNS proof generation and validation
+- [`@chainlink/ccip-read-server`](https://github.com/smartcontractkit/ccip-read): Framework for implementing CCIP-Read servers
+
+## License
+
+MIT
+
+## Support
+
+For support, please open an issue in the GitHub repository or contact our support team at support@ens.domains.
