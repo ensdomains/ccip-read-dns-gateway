@@ -72,14 +72,12 @@ export default {
     // analytics non-blocking
     logAsync(tracker.trackEvent, request, 'request', {}, true);
     logAsync(tracker.trackPageview, request, {}, true);
-    const router = routeHandler(env, (...args: any) => 
+    const router = routeHandler(env, (...args: any) =>
       logAsync(tracker.trackEvent.bind(tracker, request), ...args)
     );
-    return router
-      .handle(request)
-      .then((result: any) => {
-        logAsync(tracker.logResult, propsDecoder, request, result);
-        return result;
-      });
+    return router.handle(request).then((result: any) => {
+      logAsync(tracker.logResult, propsDecoder, request, result);
+      return result;
+    });
   },
 };
