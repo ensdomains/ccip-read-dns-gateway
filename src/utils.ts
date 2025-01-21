@@ -12,6 +12,14 @@ export function serializeError(error: any) {
   }
 }
 
+export const logAsync = (fn: Function, ...args: any[]) => {
+  setTimeout(() => {
+    Promise.resolve(fn(...args)).catch(err => {
+      console.error('Logging error:', err);
+    });
+  }, 0);
+};
+
 type DNSRecord = {
   rrset: string;
   sig: string;

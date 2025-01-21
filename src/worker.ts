@@ -7,7 +7,7 @@ import { PropsDecoder, Tracker } from '@ensdomains/server-analytics';
 import { dohQuery } from '@ensdomains/dnsprovejs';
 import { ethers } from 'ethers';
 import { makeApp } from './app';
-import { extractENSRecord } from './utils';
+import { extractENSRecord, logAsync } from './utils';
 
 interface ENV {
   DOH_GATEWAY_URL: string;
@@ -60,7 +60,7 @@ const propsDecoder: PropsDecoder<CFWRequest> = (
   return { result: extractENSRecord(structuredData) };
 };
 
-module.exports = {
+export default {
   fetch: async function(
     request: CFWRequest,
     env: ENV,
@@ -69,11 +69,17 @@ module.exports = {
     if (env.PLAUSIBLE_BASE_URL) {
       tracker.apiEndpoint = env.PLAUSIBLE_BASE_URL;
     }
-    await tracker.trackEvent(request, 'request', {}, true);
-    await tracker.trackPageview(request, {}, true);
-    const router = routeHandler(env, tracker.trackEvent.bind(tracker, request));
+    // analytics non-blocking
+    logAsync(tracker.trackEvent, request, 'request', {}, true);
+    logAsync(tracker.trackPageview, request, {}, true);
+    const router = routeHandler(env, (...args: any) => 
+      logAsync(tracker.trackEvent.bind(tracker, request), ...args)
+    );
     return router
       .handle(request)
-      .then(tracker.logResult.bind(this, propsDecoder, request));
+      .then((result: any) => {
+        logAsync(tracker.logResult, propsDecoder, request, result);
+        return result;
+      });
   },
 };

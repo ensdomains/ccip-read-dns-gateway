@@ -42,13 +42,15 @@ export function makeApp(
         }
 
         if (trackEvent) {
-          trackEvent(
-            'resolve',
-            {
-              props: { name: decodedName, qtype: qTypes.toString(qtype) },
-            },
-            true
-          );
+          setTimeout(() => {
+            trackEvent(
+              'resolve',
+              {
+                props: { name: decodedName, qtype: qTypes.toString(qtype) },
+              },
+              true
+            ).catch(console.error);
+          }, 0);
         }
 
         try {
@@ -68,13 +70,15 @@ export function makeApp(
           return [ret];
         } catch (error) {
           if (trackEvent) {
-            trackEvent(
-              'error',
-              {
-                props: { name: decodedName, message: serializeError(error) },
-              },
-              true
-            );
+            setTimeout(() => {
+              trackEvent(
+                'error',
+                {
+                  props: { name: decodedName, message: serializeError(error) },
+                },
+                true
+              ).catch(console.error);
+            }, 0);
           }
 
           return emptyRRSet;
