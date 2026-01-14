@@ -16,7 +16,7 @@
     "build:worker": "wrangler build",
     "publish:worker": "wrangler publish",
     "log:worker": "wrangler tail",
-    "start": "yarn build && node dist/index.js",
+    "start": "bun run build && node dist/index.js",
     "build": "tsdx build",
     "test": "tsdx test",
     "lint": "tsdx lint",
