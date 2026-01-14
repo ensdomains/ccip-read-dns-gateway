@@ -33,7 +33,7 @@ jobs:
         with:
           repository: ensdomains/ens-contracts
           path: './contracts'
-          ref: '6b9aaae963f71792ab1a75de61d5151ff1d1b7e3'
+          ref: '0eb24b9e830529bde769ef8f8ba60cda53f2d2e3'
 
       - name: Run local node
         run: |
