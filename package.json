@@ -32,7 +32,14 @@
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.ts"
     ],
-    "testTimeout": 20000
+    "testTimeout": 20000,
+    "roots": [
+      "<rootDir>/tests"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/ens-contracts",
+      "<rootDir>/contracts"
+    ]
   },
   "prettier": {
     "printWidth": 80,
