@@ -12,12 +12,23 @@ export function serializeError(error: any) {
   }
 }
 
-export const logAsync = (fn: Function, ...args: any[]) => {
-  setTimeout(() => {
-    Promise.resolve(fn(...args)).catch(err => {
-      console.error('Logging error:', err);
-    });
-  }, 0);
+export const logAsync = (fn: Function | undefined, ...args: any[]): Promise<void> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      try {
+        if (typeof fn !== 'function') {
+          resolve();
+          return;
+        }
+        Promise.resolve(fn(...args)).catch(err => {
+          console.error('Logging error:', err);
+        }).finally(resolve);
+      } catch (err) {
+        console.error('Logging error:', err);
+        resolve();
+      }
+    }, 0);
+  });
 };
 
 type DNSRecord = {

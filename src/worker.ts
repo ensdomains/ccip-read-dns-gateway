@@ -70,13 +70,13 @@ export default {
       tracker.apiEndpoint = env.PLAUSIBLE_BASE_URL;
     }
     // analytics non-blocking
-    logAsync(tracker.trackEvent, request, 'request', {}, true);
-    logAsync(tracker.trackPageview, request, {}, true);
+    logAsync(tracker.trackEvent.bind(tracker), request, 'request', {}, true);
+    logAsync(tracker.trackPageview.bind(tracker), request, {}, true);
     const router = routeHandler(env, (...args: any) =>
       logAsync(tracker.trackEvent.bind(tracker, request), ...args)
     );
     return router.handle(request).then((result: any) => {
-      logAsync(tracker.logResult, propsDecoder, request, result);
+      logAsync(tracker.logResult.bind(tracker), propsDecoder, request, result);
       return result;
     });
   },

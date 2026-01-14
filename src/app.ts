@@ -42,15 +42,19 @@ export function makeApp(
         }
 
         if (trackEvent) {
-          setTimeout(() => {
-            trackEvent(
-              'resolve',
-              {
-                props: { name: decodedName, qtype: qTypes.toString(qtype) },
-              },
-              true
-            ).catch(console.error);
-          }, 0);
+          try {
+            Promise.resolve(
+              trackEvent(
+                'resolve',
+                {
+                  props: { name: decodedName, qtype: qTypes.toString(qtype) },
+                },
+                true
+              )
+            ).catch(() => {});
+          } catch {
+            // ignore analytics errors
+          }
         }
 
         try {
@@ -70,15 +74,19 @@ export function makeApp(
           return [ret];
         } catch (error) {
           if (trackEvent) {
-            setTimeout(() => {
-              trackEvent(
-                'error',
-                {
-                  props: { name: decodedName, message: serializeError(error) },
-                },
-                true
-              ).catch(console.error);
-            }, 0);
+            try {
+              Promise.resolve(
+                trackEvent(
+                  'error',
+                  {
+                    props: { name: decodedName, message: serializeError(error) },
+                  },
+                  true
+                )
+              ).catch(() => {});
+            } catch {
+              // ignore analytics errors
+            }
           }
 
           return emptyRRSet;
