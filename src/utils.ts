@@ -12,7 +12,10 @@ export function serializeError(error: any) {
   }
 }
 
-export const logAsync = (fn: Function | undefined, ...args: any[]): Promise<void> => {
+export const logAsync = (
+  fn: Function | undefined,
+  ...args: any[]
+): Promise<void> => {
   return new Promise(resolve => {
     setTimeout(() => {
       try {
@@ -20,9 +23,11 @@ export const logAsync = (fn: Function | undefined, ...args: any[]): Promise<void
           resolve();
           return;
         }
-        Promise.resolve(fn(...args)).catch(err => {
-          console.error('Logging error:', err);
-        }).finally(resolve);
+        Promise.resolve(fn(...args))
+          .catch(err => {
+            console.error('Logging error:', err);
+          })
+          .finally(resolve);
       } catch (err) {
         console.error('Logging error:', err);
         resolve();

@@ -79,7 +79,10 @@ export function makeApp(
                 trackEvent(
                   'error',
                   {
-                    props: { name: decodedName, message: serializeError(error) },
+                    props: {
+                      name: decodedName,
+                      message: serializeError(error),
+                    },
                   },
                   true
                 )
