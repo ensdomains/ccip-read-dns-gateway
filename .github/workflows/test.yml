@@ -33,12 +33,15 @@ jobs:
         with:
           repository: ensdomains/ens-contracts
           path: './contracts'
-          ref: '0eb24b9e830529bde769ef8f8ba60cda53f2d2e3'
+          ref: '6b9aaae963f71792ab1a75de61d5151ff1d1b7e3'
 
+      # TODO: temporary monkey patch - @ensdomains/buffer@0.1.1 was removed from npm
+      # Remove this once ens-contracts updates their dependency
       - name: Run local node
         run: |
           cd ./contracts
-          yarn
+          sed -i.bak 's/"@ensdomains\/buffer": "\^0.1.1"/"@ensdomains\/buffer": "^0.1.3"/' package.json && rm package.json.bak
+          npm install --legacy-peer-deps
           npx hardhat node --hostname 127.0.0.1 > hardhat_output.log 2>&1 &
           echo $! > hardhat_pid.txt
         env:
