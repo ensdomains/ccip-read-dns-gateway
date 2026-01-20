@@ -35,16 +35,15 @@ jobs:
           path: './ens-contracts'
           ref: '0fee351e8fbd6b6f0ac50aab96fc6e1dfc5cca7f'
 
-      # Temporary fix: @ensdomains/buffer@0.1.1 no longer exists, use 0.1.3
-      - name: Fix buffer dependency
+      - name: Install and compile ENS contracts
         run: |
           cd ./ens-contracts
-          sed -i.bak 's/"@ensdomains\/buffer": "\^0.1.1"/"@ensdomains\/buffer": "^0.1.3"/' package.json && rm package.json.bak
+          npm install --legacy-peer-deps
+          npx hardhat compile
 
       - name: Run local node
         run: |
           cd ./ens-contracts
-          npm install --legacy-peer-deps
           npx hardhat node --hostname 127.0.0.1 > hardhat_output.log 2>&1 &
           echo $! > hardhat_pid.txt
         env:
