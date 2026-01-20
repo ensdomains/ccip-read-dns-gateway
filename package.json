@@ -82,7 +82,7 @@
   "dependencies": {
     "@chainlink/ccip-read-server": "^0.2.1",
     "@ensdomains/ccip-read-cf-worker": "^0.0.3",
-    "@ensdomains/dnsprovejs": "^0.4.1",
+    "@ensdomains/dnsprovejs": "^0.5.2",
     "@ensdomains/server-analytics": "^0.0.1",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
