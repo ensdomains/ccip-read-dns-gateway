@@ -16,7 +16,7 @@
     "build:worker": "wrangler build",
     "publish:worker": "wrangler publish",
     "log:worker": "wrangler tail",
-    "start": "yarn build && node dist/index.js",
+    "start": "bun run build && node dist/index.js",
     "build": "tsdx build",
     "test": "tsdx test",
     "lint": "tsdx lint",
@@ -32,7 +32,14 @@
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.ts"
     ],
-    "testTimeout": 20000
+    "testTimeout": 20000,
+    "roots": [
+      "<rootDir>/tests"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/ens-contracts",
+      "<rootDir>/contracts"
+    ]
   },
   "prettier": {
     "printWidth": 80,
@@ -75,7 +82,7 @@
   "dependencies": {
     "@chainlink/ccip-read-server": "^0.2.1",
     "@ensdomains/ccip-read-cf-worker": "^0.0.3",
-    "@ensdomains/dnsprovejs": "^0.4.1",
+    "@ensdomains/dnsprovejs": "^0.5.2",
     "@ensdomains/server-analytics": "^0.0.1",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",

@@ -8,8 +8,12 @@ import { dohQuery } from '@ensdomains/dnsprovejs';
 import * as packet from 'dns-packet';
 import supertest from 'supertest';
 import { makeApp } from '../src/app';
-import OffchainDNSResolver_abi from '../src/artifacts/OffchainDNSResolver.json';
-import Resolver_abi from '../src/artifacts/OwnedResolver.json';
+// All artifacts from ens-contracts clone (staging branch)
+import ExtendedDNSResolver_abi from '../ens-contracts/artifacts/contracts/resolvers/profiles/ExtendedDNSResolver.sol/ExtendedDNSResolver.json';
+import OffchainDNSResolver_abi from '../ens-contracts/artifacts/contracts/dnsregistrar/OffchainDNSResolver.sol/OffchainDNSResolver.json';
+import Resolver_abi from '../ens-contracts/artifacts/contracts/resolvers/OwnedResolver.sol/OwnedResolver.json';
+import ENSRegistry_abi from '../ens-contracts/artifacts/contracts/registry/ENSRegistry.sol/ENSRegistry.json';
+import BaseRegistrar_abi from '../ens-contracts/artifacts/contracts/ethregistrar/BaseRegistrarImplementation.sol/BaseRegistrarImplementation.json';
 import {
   BaseProvider,
   BlockTag,
@@ -25,13 +29,16 @@ export type Fetch = (url: string, json?: string) => Promise<any>;
 
 const Resolver = new ethers.utils.Interface(Resolver_abi.abi);
 
-const ENS_ADDRESS = '0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E';
+// Hardhat deterministic deployment addresses
+const ENS_ADDRESS = '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9'; // ENSRegistry
 const DNSSEC_IMPL = '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e';
-const OWNED_RESOLVER = '0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00';
+const PUBLIC_RESOLVER = '0x1291Be112d480055DaFd8a610b7d1e203891C274';
+const BASE_REGISTRAR = '0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E';
 
 const TEST_URL = 'https://localhost:8000/query';
-const TEST_NAME = 'tanrikulu.xyz'; // use a domain with resolver txt set (e.g. ENS1 0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00)
-const TEST_ADDRESS = '0xfefeFEFeFEFEFEFEFeFefefefefeFEfEfefefEfe';
+const TEST_NAME = 'tanrikulu.xyz'; // DNS TXT: ENS1 dnsname.ens.eth a[60]=<address>
+// This address comes from the DNS TXT record context: a[60]=0x0D59d0f7DcC0fBF0A3305cE0261863aAf7Ab685c
+const TEST_ADDRESS = '0x0D59d0f7DcC0fBF0A3305cE0261863aAf7Ab685c';
 
 const CCIP_READ_INTERFACE = new ethers.utils.Interface(
   OffchainDNSResolver_abi.abi
@@ -205,7 +212,7 @@ describe('End to end test', () => {
   const signer = baseProvider.getSigner();
   const proxyMiddleware = new RevertNormalisingMiddleware(baseProvider);
   const mockProvider = new MockProvider(proxyMiddleware, fetcher);
-  let resolver: Contract, ownedResolver: Contract;
+  let resolver: Contract;
 
   async function checkIfContractIsReachable(
     address: string,
@@ -222,8 +229,69 @@ describe('End to end test', () => {
   beforeAll(async () => {
     await checkIfContractIsReachable(ENS_ADDRESS, 'ENS');
     await checkIfContractIsReachable(DNSSEC_IMPL, 'DNSSEC_IMPL');
-    await checkIfContractIsReachable(OWNED_RESOLVER, 'OWNED_RESOLVER');
+    await checkIfContractIsReachable(PUBLIC_RESOLVER, 'PUBLIC_RESOLVER');
 
+    const signerAddress = await signer.getAddress();
+
+    // Deploy ExtendedDNSResolver
+    const extendedDNSResolver = await deploySolidity(
+      ExtendedDNSResolver_abi,
+      signer
+    );
+
+    // Set up contracts
+    const ensRegistry = new ethers.Contract(
+      ENS_ADDRESS,
+      ENSRegistry_abi.abi,
+      signer
+    );
+    const publicResolver = new ethers.Contract(
+      PUBLIC_RESOLVER,
+      Resolver_abi.abi,
+      signer
+    );
+    const baseRegistrar = new ethers.Contract(
+      BASE_REGISTRAR,
+      BaseRegistrar_abi.abi,
+      signer
+    );
+
+    // Check if ens.eth is already registered (from hardhat deploy scripts)
+    const ensLabelHash = ethers.utils.keccak256(
+      ethers.utils.toUtf8Bytes('ens')
+    );
+    const ensLabelId = ethers.BigNumber.from(ensLabelHash);
+
+    const isAvailable = await baseRegistrar.available(ensLabelId);
+    if (isAvailable) {
+      // Add signer as controller of BaseRegistrar (owner can do this)
+      await baseRegistrar.addController(signerAddress);
+
+      // Register for 1 year (in seconds)
+      const duration = 365 * 24 * 60 * 60;
+      await baseRegistrar.register(ensLabelId, signerAddress, duration);
+    }
+
+    // Now we own ens.eth and can set up subdomains
+    const ensEthNode = ethers.utils.namehash('ens.eth');
+    const dnsnameLabel = ethers.utils.keccak256(
+      ethers.utils.toUtf8Bytes('dnsname')
+    );
+    const dnsnameEnsEthNode = ethers.utils.namehash('dnsname.ens.eth');
+
+    // Set subnode owner for 'dnsname' under 'ens.eth'
+    await ensRegistry.setSubnodeOwner(ensEthNode, dnsnameLabel, signerAddress);
+
+    // Set resolver for dnsname.ens.eth
+    await ensRegistry.setResolver(dnsnameEnsEthNode, PUBLIC_RESOLVER);
+
+    // Set addr for dnsname.ens.eth to ExtendedDNSResolver address
+    await publicResolver['setAddr(bytes32,address)'](
+      dnsnameEnsEthNode,
+      extendedDNSResolver.address
+    );
+
+    // Deploy OffchainDNSResolver
     resolver = (
       await deploySolidity(
         OffchainDNSResolver_abi,
@@ -233,20 +301,13 @@ describe('End to end test', () => {
         TEST_URL
       )
     ).connect(mockProvider);
-
-    ownedResolver = new ethers.Contract(
-      OWNED_RESOLVER,
-      Resolver_abi.abi,
-      signer
-    );
-  });
+  }, 60000);
 
   describe('resolve()', () => {
     it('resolves calls to addr(bytes32)', async () => {
-      await ownedResolver['setAddr(bytes32,address)'](
-        ethers.utils.namehash(TEST_NAME),
-        TEST_ADDRESS
-      );
+      // The DNS TXT record for tanrikulu.xyz contains:
+      // ENS1 dnsname.ens.eth a[60]=0x0D59d0f7DcC0fBF0A3305cE0261863aAf7Ab685c
+      // ExtendedDNSResolver parses the context and returns the address
 
       const callData = Resolver.encodeFunctionData('addr(bytes32)', [
         ethers.utils.namehash(TEST_NAME),

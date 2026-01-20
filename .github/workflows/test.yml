@@ -11,37 +11,44 @@ env:
 
 jobs:
   e2e:
-    name: Run tests on Node ${{ matrix.node }} and ${{ matrix.os }}
+    name: Run tests on ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: ['18.x']
         os: [ubuntu-latest, macOS-latest]
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Use Node ${{ matrix.node }}
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: '22'
 
-      - name: Install deps and build (with cache)
-        uses: bahmutov/npm-install@v1
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
       - name: Check out ENS contracts
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ensdomains/ens-contracts
-          path: './contracts'
-          ref: '6b9aaae963f71792ab1a75de61d5151ff1d1b7e3'
+          path: './ens-contracts'
+          ref: '0fee351e8fbd6b6f0ac50aab96fc6e1dfc5cca7f'
+
+      - name: Install and compile ENS contracts
+        run: |
+          cd ./ens-contracts
+          npm install --legacy-peer-deps
+          npx hardhat compile
 
       - name: Run local node
         run: |
-          cd ./contracts
-          yarn
+          cd ./ens-contracts
           npx hardhat node --hostname 127.0.0.1 > hardhat_output.log 2>&1 &
           echo $! > hardhat_pid.txt
         env:
@@ -54,7 +61,7 @@ jobs:
           while true; do
             if [ $timeout -le 0 ]; then
               echo "Timeout waiting for Hardhat node"
-              cat hardhat_output.log
+              cat ./ens-contracts/hardhat_output.log
               exit 1
             fi
             if nc -z localhost 8545 2>/dev/null; then
@@ -68,20 +75,20 @@ jobs:
         shell: bash
 
       - name: Test
-        run: yarn test --ci --coverage --maxWorkers=2
+        run: bun run test --ci --coverage --maxWorkers=2
 
       - name: Upload Hardhat logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: hardhat-logs
-          path: ./contracts/hardhat_output.log
+          name: hardhat-logs-${{ matrix.os }}
+          path: ./ens-contracts/hardhat_output.log
 
       - name: Cleanup Hardhat process
         if: always()
         run: |
-          if [ -f ./contracts/hardhat_pid.txt ]; then
-            pid=$(cat ./contracts/hardhat_pid.txt)
+          if [ -f ./ens-contracts/hardhat_pid.txt ]; then
+            pid=$(cat ./ens-contracts/hardhat_pid.txt)
             kill $pid 2>/dev/null || true
           fi
         shell: bash
